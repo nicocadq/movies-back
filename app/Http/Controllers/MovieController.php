@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class MovieController extends Controller
+use App\Models\Movie;
+
+class MovieController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +15,12 @@ class MovieController extends Controller
      */
     public function index()
     {
-        //
+        $Movies = Movie::
+                    select('id','name','image')
+                    ->get();
+        dd($Movies);
+        return $this->sendResponse($Movies,"Get movies successfully");
+        // return $this->sendError("Error Conocido", "Error controlado", 200);
     }
 
     /**
@@ -34,7 +41,15 @@ class MovieController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $Movie = new Movie();
+            $Movie->name = $request->input('name');
+            $Movie->image = $request->input('image');
+            $Movie->save();
+            return $this->sendResponse($Movie,"Movie created successfully");
+        } catch (Exception $e) {
+            return $this->sendError("Error", 200);
+        }
     }
 
     /**
@@ -45,7 +60,10 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        //
+        $Movie = Movie::where('id',$id)
+                ->select('id','name','image')
+                ->get();
+        return $this->sendResponse($Movie,"Obtained movie successfully");
     }
 
     /**
