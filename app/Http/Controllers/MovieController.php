@@ -18,9 +18,7 @@ class MovieController extends ApiController
         $Movies = Movie::
                     select('id','name','image')
                     ->get();
-        dd($Movies);
         return $this->sendResponse($Movies,"Get movies successfully");
-        // return $this->sendError("Error Conocido", "Error controlado", 200);
     }
 
     /**
@@ -46,9 +44,10 @@ class MovieController extends ApiController
             $Movie->name = $request->input('name');
             $Movie->image = $request->input('image');
             $Movie->save();
+
             return $this->sendResponse($Movie,"Movie created successfully");
         } catch (Exception $e) {
-            return $this->sendError("Error", 200);
+            return $this->sendError("Error", 400);
         }
     }
 
@@ -60,9 +59,12 @@ class MovieController extends ApiController
      */
     public function show($id)
     {
-        $Movie = Movie::where('id',$id)
-                ->select('id','name','image')
-                ->get();
+        $Movie = Movie::find($id);
+
+        if(!$Movie){
+            return $this->sendError("Movie not found");
+        }
+
         return $this->sendResponse($Movie,"Obtained movie successfully");
     }
 
@@ -86,7 +88,17 @@ class MovieController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // $Movie = Movie::findOrFail($id);
+            // $Movie->name = $request->input('name');
+            // $Movie->image = $request->input('image');
+
+            // $Movie->save();
+
+            return $this->sendResponse($request,"Movie created successfully");
+        } catch (Exception $e) {
+            return $this->sendError("Error", 200);
+        }
     }
 
     /**
@@ -97,6 +109,7 @@ class MovieController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        Movie::destroy($id);   
+        return $this->sendResponse([], "Deleted movie successfully");
     }
 }
